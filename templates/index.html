@@ -4,6 +4,16 @@
     <title>{{ title }}</title>
   </head>
   <body>
-    <h1>Hello world!</h1>
+    <div class="gallery">
+      {% if images %}
+        {% for img in images %}
+          <a href="{{ url_for('uploaded_file', filename=img) }}" target="_blank">
+            <img src="{{ url_for('uploaded_file', filename=img) }}">
+          </a>
+        {% endfor %}
+      {% else %}
+        <p>No images(</p>
+      {% endif %}
+    </div>
   </body>
 </html>

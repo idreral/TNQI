@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+  </head>
+  <body>
+    <h2>Upload files</h2>
+    <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <input type="submit" value="Send">
+    </form>
+  </body>
+</html>
