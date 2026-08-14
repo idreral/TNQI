@@ -2,18 +2,26 @@
 <html>
   <head>
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
   </head>
   <body>
-    {% include 'hor_nav_menu.html' %}
-    <div class="gallery">
-      {% if images %}
+    <div class="header">
+      <form>
+        <input placeholder="Search...">
+      </form>
+    </div>
+    <div class="side-menu">
+      <a href="{{ url_for('upload') }}">Upload</a>
+    </div>
+    <div class="recommend">
+      {%if images %}
         {% for img in images %}
           <a href="{{ url_for('uploaded_file', filename=img) }}" target="_blank">
             <img src="{{ url_for('uploaded_file', filename=img) }}">
           </a>
         {% endfor %}
       {% else %}
-        <p>No images(</p>
+        <p>No data</p>
       {% endif %}
     </div>
   </body>

@@ -12,7 +12,7 @@ def get_uploaded_files(upload_folder):
         return []
     files = os.listdir(upload_folder)
     images = [f for f in files if allowed_file(f)]
-    images.sort(key=lambda x: os.path.getmtine(os.path.join(upload_folder, x)), reverse=True)
+    images.sort(key=lambda x: os.path.getmtime(os.path.join(upload_folder, x)), reverse=True)
     return images
 
 def save_uploaded_files(files, upload_folder):
