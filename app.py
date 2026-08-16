@@ -755,7 +755,7 @@ def upload():
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
             file.save(file_path)
             
-            file_type = 'image' if file_ext.lower() in ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'tiff'] else 'video'
+            file_type = 'image' if file_ext.lower() in ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'tiff', 'gif'] else 'video'
 
             new_content = Content(title=title, file_path=file_path, file_type=file_type)
 
