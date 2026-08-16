@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View History</title>
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .history-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .history-item img {
+            max-width: 100%;
+            height: auto;
+        }
+        .badge {
+            background: #007bff;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Recently Viewed Content ({{ history_count }}/50)</h1>
+
+        <div class="history-grid">
+            {% for content in history %}
+            <div class="history-item">
+                <span class="badge">ID: {{ content.id }}</span>
+                <p>{{ content.title }}</p>
+                <p>Rating: {{ content.rating }}</p>
+                <p>Tags: {{ content.tags|map(attribute='name')|join(', ') }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 20px;">
+            <a href="/">← Back to main</a>
+            <form action="/clear-history" method="POST" style="display: inline; margin-left: 10px;">
+                <button type="submit" onclick="return confirm('Clear history?')">Clear History</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

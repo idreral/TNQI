@@ -1,0 +1,45 @@
+.page-wrap{
+	margin: 15px auto;
+	width: fit-content;
+}
+
+input {
+  outline:0;
+  color: #d8d8d8;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: 0px;
+  background-color: #090909;
+  font-family: Manrope;
+}
+
+input[type=textbox]{
+	width: 200px;
+}
+
+input[type=button]:hover{
+  background-color: #191919;
+}
+
+.tag-list{
+	margin: 15px auto;
+	border: 1px solid #989898;
+	width: fit-content;
+	border-radius: 5px;
+	padding: 10px;
+}
+
+td{
+	text-align: right;
+	padding: 0 10px;
+}
+
+.delete-tag-btn{
+	border: none;
+	background-color: inherit;
+	cursor: pointer;
+	display: inline-block;
+	color: #bb0000;
+	font-size: 15pt;
+}

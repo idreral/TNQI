@@ -1,0 +1,41 @@
+<!-- templates/tag_stats.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tag Statistics</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .high-score { background-color: #d4edda; }
+        .low-score { background-color: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>Tag Quality Statistics</h1>
+    <p>Total content: {{ total_content }}</p>
+    <table>
+        <tr>
+            <th>Tag</th>
+            <th>Score</th>
+            <th>Lift</th>
+            <th>Count</th>
+            <th>Avg Rating</th>
+            <th>Coverage</th>
+            <th>P-Value</th>
+        </tr>
+        {% for item in stats_list %}
+        <tr class="{% if item.stats.score > 1 %}high-score{% elif item.stats.score < 0.5 %}low-score{% endif %}">
+            <td>{{ item.tag.name }}</td>
+            <td>{{ "%.3f"|format(item.stats.score) }}</td>
+            <td>{{ "%.2f"|format(item.stats.lift) }}</td>
+            <td>{{ item.stats.count }}</td>
+            <td>{{ "%.2f"|format(item.stats.avg_rating) }}</td>
+            <td>{{ "%.1f"|format(item.stats.coverage * 100) }}%</td>
+            <td>{{ "%.4f"|format(item.stats.p_value) }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="/">Back to main</a>
+</body>
+</html>

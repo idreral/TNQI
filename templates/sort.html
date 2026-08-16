@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TNQI - Sort Content</title>
+    <style>
+        @font-face {
+            font-family: Manrope;
+            src: url({{ url_for('static', filename='fonts/Manrope.ttf') }});
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Manrope, sans-serif;
+            background: #1a1a1a;
+            color: #D8D8D8;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            gap: 15px;
+        }
+
+        .site-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #333;
+        }
+
+        .hor-nav-bar {
+            display: flex;
+            gap: 20px;
+            padding: 10px 20px;
+        }
+
+        .hor-nav-bar a {
+            color: #D8D8D8;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+
+        .hor-nav-bar a:hover {
+            background-color: #333;
+        }
+
+        .sort-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .progress {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #aaa;
+        }
+
+        .comparison-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #222;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            width: 300px;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.1s;
+        }
+
+        .card:hover {
+            border-color: #007bff;
+            transform: scale(1.02);
+        }
+
+        .card img, .card video {
+            width: 100%;
+            height: 250px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #111;
+        }
+
+        .card h3 {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .card p {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .vs {
+            font-size: 32px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: 1px solid #444;
+            background: #2a2a2a;
+            color: #D8D8D8;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: Manrope, sans-serif;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #3a3a3a;
+        }
+
+        .btn.primary {
+            background: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn.primary:hover {
+            background: #0056b3;
+        }
+
+        .finished-message {
+            font-size: 24px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span class="site-name">TNQI</span>
+    </div>
+    <hr>
+    <div class="hor-nav-bar">
+        <a href="{{ url_for('index') }}">Content list</a>
+        <a href="{{ url_for('upload') }}">Upload new content</a>
+        <a href="{{ url_for('manage_tags') }}">Manage tags</a>
+        <a href="{{ url_for('random_content') }}">Random</a>
+        <a href="{{ url_for('sort_page') }}">Sort</a>
+    </div>
+    <hr>
+
+    <div class="sort-container">
+        {% if finished %}
+            <div class="finished-message">✅ Sorting complete!</div>
+            <div class="button-row">
+                <form action="{{ url_for('sort_reset') }}" method="post">
+                    <button class="btn primary">Start New Sort</button>
+                </form>
+            </div>
+        {% else %}
+            <div class="progress">
+                Comparison {{ state.completed }} / {{ state.total }}
+            </div>
+
+            <div class="comparison-area">
+                <div class="card" onclick="choose('left')">
+                    {% set left_ext = 'png' if left_item.file_type == 'image' else 'gif' %}
+                    {% set left_norm = left_item.file_path | replace('\\', '/') %}
+                    {% set left_preview = left_norm
+                        | replace('static/uploads/', 'static/uploads/preview/')
+                        | replace(left_item.file_path.split('.')[-1], left_ext) %}
+                    {% if left_item.file_type == 'image' %}
+                        <img src="{{ left_norm }}" alt="{{ left_item.title }}">
+                    {% else %}
+                        <video src="{{ left_norm }}" muted loop autoplay></video>
+                    {% endif %}
+                    <h3>{{ left_item.title }}</h3>
+                    <p>⭐ {{ left_item.rating }} | {{ left_item.tags|map(attribute='name')|join(', ') }}</p>
+                </div>
+                <div class="vs">VS</div>
+                <div class="card" onclick="choose('right')">
+                    {% set right_ext = 'png' if right_item.file_type == 'image' else 'gif' %}
+                    {% set right_norm = right_item.file_path | replace('\\', '/') %}
+                    {% set right_preview = right_norm
+                        | replace('static/uploads/', 'static/uploads/preview/')
+                        | replace(right_item.file_path.split('.')[-1], right_ext) %}
+                    {% if right_item.file_type == 'image' %}
+                        <img src="{{ right_norm }}" alt="{{ right_item.title }}">
+                    {% else %}
+                        <video src="{{ right_norm }}" muted loop autoplay></video>
+                    {% endif %}
+                    <h3>{{ right_item.title }}</h3>
+                    <p>⭐ {{ right_item.rating }} | {{ right_item.tags|map(attribute='name')|join(', ') }}</p>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <form id="choiceForm" action="{{ url_for('sort_choose') }}" method="post" style="display:none;">
+                    <input type="hidden" name="winner" id="winnerInput">
+                </form>
+                {% if state.history|length > 0 %}
+                <form action="{{ url_for('sort_undo') }}" method="post">
+                    <button class="btn">Undo</button>
+                </form>
+                {% endif %}
+                <form action="{{ url_for('sort_reset') }}" method="post">
+                    <button class="btn">Reset</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function choose(side) {
+            document.getElementById('winnerInput').value = side;
+            document.getElementById('choiceForm').submit();
+        }
+    </script>
+</body>
+</html>

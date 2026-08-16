@@ -1,0 +1,35 @@
+.login-background{
+  text-align: center;
+}
+
+.login-form{
+  margin: 150px auto 0 auto;
+}
+
+.form-row{
+  margin-bottom: 10px;
+}
+
+form {
+  margin: 0;
+}
+
+form.login-form input {
+  outline:0;
+  color: #d8d8d8;
+  font-size: 14px;
+  padding: 8px 10px;
+  width: 200px;
+  border-radius: 5px;
+  border: 0px;
+  background-color: #090909;
+  font-family: Manrope;
+}
+
+form.login-form input[type=submit]:hover{
+  background-color: #191919;
+}
+
+body{
+  height: 90%;
+}

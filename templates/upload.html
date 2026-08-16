@@ -1,14 +1,26 @@
+<!-- templates/upload.html -->
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{{ title }}</title>
-  </head>
-  <body>
-    {% include 'hor_nav_menu.html' %}
-    <h2>Upload files</h2>
-    <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
-      <input type="file" name="file">
-      <input type="submit" value="Send">
+<head>
+    <title>Upload Content</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}">
+    <style>
+        @font-face {
+            font-family: Manrope;
+            src: url({{ url_for('static', filename='fonts/Manrope.ttf') }});
+        }
+        </style>
+</head>
+<body>
+    <h1>Upload New Content</h1>
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="Title" required>
+        <input type="file" name="file" required>
+        <p>Select tags:</p>
+        {% for tag in tags|sort(attribute='name') %}
+            <input type="checkbox" name="tags" value="{{ tag.id }}"> {{ tag.name }}<br>
+        {% endfor %}
+        <button type="submit">Upload</button>
     </form>
-  </body>
+</body>
 </html>

@@ -1,28 +1,260 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-  </head>
-  <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TNQI - Content Gallery</title>
+    <script>
+        function openModal(contentId, filePath, fileType, rating, title) {
+            let modal = document.getElementById("contentModal");
+            let modalBody = document.getElementById("modalBody");
+            
+            modalBody.innerHTML = fileType === 'image'
+                ? `<img src="${filePath}" width="100%">`
+                : `<video width="100%" controls><source src="${filePath}" type="video/mp4"></video>`;
+            
+            modalBody.innerHTML += `
+                <p>${title}</p>
+                <p id="modal-rating">Rating: ${rating}</p>
+                <button class="vote-button" onclick="vote(${contentId}, 'up')">+1</button>
+                <button class="vote-button" onclick="vote(${contentId}, 'down')">-1</button>
+                <button onclick="confirmDeletion(${contentId})">Delete</button>
+                <button onclick="openEditTagsModal(${contentId})">Edit Tags</button>
+            `;
+            
+            modal.style.display = "block";
+        }
+        
+        function closeModal(event) {
+            if (event.target.id === "contentModal") {
+                document.getElementById("contentModal").style.display = "none";
+            }
+        }
+        
+        function vote(contentId, change) {
+            fetch(`/rate/${contentId}/${change}`, { method: "POST", headers: { "Content-Type": "application/json" }})
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("modal-rating").textContent = `Rating: ${data.new_rating}`;
+                    document.getElementById(`rating-${contentId}`).textContent = `Rating: ${data.new_rating}`;
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+        
+        function confirmDeletion(contentId) {
+            document.getElementById("deleteModal").style.display = "block";
+            document.getElementById("confirmDelete").onclick = function() {
+                window.location.href = `/delete_content/${contentId}`;
+            };
+        }
+        
+        function closeConfirmDeletionModal() {
+            document.getElementById("deleteModal").style.display = "none";
+        }
+
+        function openEditTagsModal(contentId) {
+            let modal = document.getElementById("editTagsModal");
+            modal.style.display = "block";
+        
+            // Получаем контейнер для чекбоксов
+            let tagsContainer = document.getElementById("tagsContainer");
+            tagsContainer.innerHTML = "";
+        
+            // Запрашиваем список тегов
+            fetch("/tags")  // Дополнительно: создаем API для списка тегов
+                .then(response => response.json())
+                .then(data => {
+                    data.tags.forEach(tag => {
+                        let checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.name = "tags";
+                        checkbox.value = tag.id;
+                        if (data.content_tags.includes(tag.id)) {
+                            checkbox.checked = true;
+                        }
+                        
+                        let label = document.createElement("label");
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(" " + tag.name));
+        
+                        tagsContainer.appendChild(label);
+                        tagsContainer.appendChild(document.createElement("br"));
+                    });
+                });
+        
+            // Устанавливаем обработчик сохранения
+            document.getElementById("editTagsForm").onsubmit = function (event) {
+                event.preventDefault();
+                
+                let formData = new FormData(this);
+                
+                fetch(`/edit_tags/${contentId}`, {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Tags updated!");
+                        closeEditTagsModal();
+                        // Обновляем теги на странице без перезагрузки
+                        document.querySelector(`#content-${contentId} .content-tags`).textContent = "       Tags: " + data.updated_tags.join(", ");
+                    }
+                });
+            };
+        }
+        
+        function closeEditTagsModal() {
+            document.getElementById("editTagsModal").style.display = "none";
+        }
+
+    </script>
+    <style>
+        @font-face {
+            font-family: Manrope;
+            src: url({{ url_for('static', filename='fonts/Manrope.ttf') }});
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .pagination a, .pagination span {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            text-decoration: none;
+            color: #D8D8D8;
+        }
+        .pagination a:hover {
+            background-color: #f0f0f0;
+        }
+        .pagination .current {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main-page.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/hor-nav-menu.css') }}">
+</head>
+<body>
     <div class="header">
-      <form>
-        <input placeholder="Search...">
-      </form>
+        <span class="site-name">TNQI</span><span class="page-name">Content list</span><a class="logout" href="index.html">logout</a>
     </div>
-    <div class="side-menu">
-      <a href="{{ url_for('upload') }}">Upload</a>
+    <hr>
+    <div class="hor-nav-bar">
+        <a href="{{ url_for('upload') }}">Upload new content</a>
+        <a href="{{ url_for('manage_tags') }}">Manage tags</a>
+        <a href="{{ url_for('random_content') }}">Recomended</a>
     </div>
-    <div class="recommend">
-      {%if images %}
-        {% for img in images %}
-          <a href="{{ url_for('uploaded_file', filename=img) }}" target="_blank">
-            <img src="{{ url_for('uploaded_file', filename=img) }}">
-          </a>
+    <hr>
+    <div class="page-wrap">
+        <div class="side-menu">
+            <form method="GET">
+    <!-- Переключатель режима -->
+<div style="margin-bottom: 10px;">
+    <label>
+        <input type="radio" name="mode" value="strict" {% if mode == 'strict' %}checked{% endif %}>
+        AND
+    </label>
+    <label>
+        <input type="radio" name="mode" value="soft" {% if mode == 'soft' %}checked{% endif %}>
+        OR
+    </label>
+    <label>
+        <input type="radio" name="mode" value="exclude" {% if mode == 'exclude' %}checked{% endif %}>
+        NOT
+    </label>
+</div>
+
+    <button type="submit">Filter</button>
+    <ul>
+        {% for tag in tags|sort(attribute='name') %}
+          <li>
+    <input type="checkbox" name="tags" value="{{ tag.id }}" {% if tag.id|string in selected_tags %}checked{% endif %}>
+    {{ tag.name }} ({{ tag_counts.get(tag.id, 0) }})
+</li> 
         {% endfor %}
-      {% else %}
-        <p>No data</p>
-      {% endif %}
+    </ul>
+</form>
+        </div>
+        <div style="width: 100%">
+        <div class="content-table">
+            {% for content in contents %}
+                <div class="content-card">
+                    {% set preview_ext = 'png' if content.file_type == 'image' else 'gif' %}
+                    {% set normalized_path = content.file_path | replace('\\', '/') %}
+                    {% set preview_path = normalized_path 
+                        | replace('static/uploads/', 'static/uploads/preview/') 
+                        | replace(content.file_path.split('.')[-1], preview_ext) %}
+                    
+                    <img src="{{ preview_path }}" width="200"
+                         onclick="window.open('{{ url_for('random_content', seed = content.id) }}', '_blank')", '{{ normalized_path }}', '{{ content.file_type }}', {{ content.rating }}, '{{ content.title }}')">
+
+                    <p class="content-title">{{ content.title }}</p>
+                    <p id="rating-{{ content.id }}">Rating: {{ content.rating }}</p>
+                    <p class="content-tags">Tags: {% for tag in content.tags|sort(attribute='name') %}{{ tag.name }} {% endfor %}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <!-- Блок пагинации -->
+ <div class="pagination">
+    {% if pagination.has_prev %}
+        <a href="{{ url_for('index', page=pagination.prev_num, tags=selected_tags, mode=mode) }}">« Назад</a>
+    {% else %}
+        <span class="disabled">« Назад</span>
+    {% endif %}
+
+    {% for page_num in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+        {% if page_num %}
+            {% if page_num == pagination.page %}
+                <span class="current">{{ page_num }}</span>
+            {% else %}
+                <a href="{{ url_for('index', page=page_num, tags=selected_tags, mode=mode) }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            <span>…</span>
+        {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+        <a href="{{ url_for('index', page=pagination.next_num, tags=selected_tags, mode=mode) }}">Вперёд »</a>
+    {% else %}
+        <span class="disabled">Вперёд »</span>
+    {% endif %}
+</div>`   </div>
+        
     </div>
-  </body>
+
+    
+
+    <!-- Модальные окна (без изменений) -->
+    <div id="contentModal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content">
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <div id="editTagsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditTagsModal()">&times;</span>
+            <h2>Edit Tags</h2>
+            <form id="editTagsForm">
+                <div id="tagsContainer"></div>
+                <button type="submit">Save</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to delete this content?</p>
+            <button id="confirmDelete">Yes</button>
+            <button onclick="closeConfirmDeletionModal()">No</button>
+        </div>
+    </div>
+</body>
 </html>
