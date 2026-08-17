@@ -1,40 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Manage Tags</title>
-</head>
-<body>
-    <h1>Manage Tags</h1>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Action</th>
-            <th>Edit</th>
-        </tr>
-        {% for tag in tags %}
-        <tr>
-            <td>{{ tag.id }}</td>
-            <td>{{ tag.name }}</td>
-            <td>
-                <form action="{{ url_for('delete_tag', tag_id=tag.id) }}" method="post">
-                    <button type="submit">Delete</button>
-                </form>
-            </td>
-            <td>
-                <form action="{{ url_for('edit_tag', tag_id=tag.id) }}" method="post">
-                    <input type="text" name="new_tag_name" value="{{ tag.name }}" required>
-                    <button type="submit">Update</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    
-    <h2>Add New Tag</h2>
-    <form action="{{ url_for('manage_tags') }}" method="post">
-        <input type="text" name="tag_name" required>
-        <button type="submit">Add Tag</button>
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block page_name %}Manage tags{% endblock %}
+{% block content %}
+  <h2>Add New Tag</h2>
+  <form action="{{ url_for('manage_tags') }}" method="post">
+    <input type="text" name="tag_name" required>
+    <button type="submit">Add Tag</button>
+  </form>
+  <h2>Edit tags</h2>
+  <table border="1">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Action</th>
+      <th>Edit</th>
+    </tr>
+    {% for tag in tags %}
+      <tr>
+        <td>{{ tag.id }}</td>
+        <td>{{ tag.name }}</td>
+        <td>
+          <form action="{{ url_for('delete_tag', tag_id=tag.id) }}" method="post">
+            <button type="submit">Delete</button>
+          </form>
+        </td>
+        <td>
+          <form action="{{ url_for('edit_tag', tag_id=tag.id) }}" method="post">
+            <input type="text" name="new_tag_name" value="{{ tag.name }}" required>
+            <button type="submit">Update</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
