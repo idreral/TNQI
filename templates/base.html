@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{% block title %}TNQI{% endblock %}</title>
+    <style>
+        @font-face {
+            font-family: Manrope;
+            src: url({{ url_for('static', filename='fonts/Manrope.ttf') }});
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .pagination a, .pagination span {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            text-decoration: none;
+            color: #D8D8D8;
+        }
+        .pagination a:hover {
+            background-color: #f0f0f0;
+        }
+        .pagination .current {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main-page.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/hor-nav-menu.css') }}">
+  </head>
+  <body>
+    <div class="header">
+      <span class="site-name">TNQI</span>
+      <span class="page-name">{% block page_name %}{% endblock %}</span>
+    </div>
+    <div class="page-wrap">
+      <div class="side-menu">
+        {% block aside %}{% include 'side_menu.html' %}{% endblock %}
+      </div>
+      <div class="page" style="width:100%">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+<nav>
+  <ul>
+    <li>
+      {% if request.endpoint == 'index' %}
+        <span>Search</span>
+      {% else %}
+        <a href="{{ url_for('index') }}">Search</a>
+      {% endif %}
+    </li>
+    <li>
+      {% if request.endpoint == 'upload' %}
+        <span>Upload</span>
+      {% else %}
+        <a href="{{ url_for('upload') }}">Upload</a>
+      {% endif %}
+    </li>
+    <li>
+      {% if request.endpoint == 'manage_tags' %}
+        <span>Manage tags</span>
+      {% else %}
+        <a href="{{ url_for('manage_tags') }}">Manage tags</a>
+      {% endif %}
+    </li>
+    <li>
+      {% if request.endpoint == 'random_content' %}
+        <span>Random content</span>
+      {% else %}
+        <a href="{{ url_for('random_content') }}">Random content</a>
+      {% endif %}
+    </li>
+    <li>
+      {% if request.endpoint == 'tag_stats' %}
+        <span>Tag stats</span>
+      {% else %}
+        <a href="{{ url_for('tag_stats') }}">Tag stats</a>
+      {% endif %}
+    </li>
+    <li>
+      {% if request.endpoint == 'view_history' %}
+        <span>History</span>
+      {% else %}
+        <a href="{{ url_for('view_history') }}">History</a>
+      {% endif %}
+    </li>
+    <li>
+      {% if request.endpoint == 'sort_page' %}
+        <span>Sort</span>
+      {% else %}
+        <a href="{{ url_for('sort_page') }}">Sort</a>
+      {% endif %}
+    </li>
+  </ul>
+</nav>

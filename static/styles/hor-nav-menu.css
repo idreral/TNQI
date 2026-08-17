@@ -1,10 +1,10 @@
-div.hor-nav-bar a{
+nav a{
   color: inherit;
   text-decoration: none;
   margin: 0px 5px;
 }
 
-.hor-nav-bar{
+nav{
   text-align: left;
   padding: 5px 25px;
 }
